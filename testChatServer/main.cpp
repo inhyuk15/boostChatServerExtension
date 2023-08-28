@@ -13,7 +13,6 @@ int main(int argc, const char* argv[]) {
     tcp::endpoint endpoint(tcp::v4(), stoi(port));
     try {
         auto server = std::make_shared<Server>(io_context, endpoint);
-        server->accept();
 
         io_context.run();
     } catch (std::exception& e) {

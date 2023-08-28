@@ -7,6 +7,10 @@
 #include <queue>
 
 using boost::asio::ip::tcp;
+using boost::asio::awaitable;
+using boost::asio::co_spawn;
+using boost::asio::detached;
+using boost::asio::use_awaitable;
 
 class Room;
 
@@ -14,18 +18,20 @@ class Session : public std::enable_shared_from_this<Session> {
 	 public:
 	Session(tcp::socket socket, std::shared_ptr<Room> room);
 	void start();
-	void read();
+	boost::asio::awaitable<void> readNickname();
+	boost::asio::awaitable<void> readMsg();
+	boost::asio::awaitable<void> startRead();
 	
 	void deliver(const std::string& msg);
-	void write();
+	boost::asio::awaitable<void> write();
+	void stop();
 	
 	std::string nickname();
 	
 	 private:
 		tcp::socket socket_;
-		boost::asio::streambuf buff_;
-		static constexpr int BUFF_SIZE = 4096;
 	std::shared_ptr<Room> room_;
+	boost::asio::steady_timer timer_;
 	
 	std::deque<std::string> writeMsgs_;
 	std::string nickname_;
