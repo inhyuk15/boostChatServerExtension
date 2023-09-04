@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		EC047FB82A5BB7CF00D4FF42 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EC047FB72A5BB7CF00D4FF42 /* main.cpp */; };
+		ECB02D022AA665F3004E51FE /* chat.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = ECB02D002AA665F2004E51FE /* chat.pb.cc */; };
+		ECB02D052AA666A3004E51FE /* ChatMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ECB02D032AA666A3004E51FE /* ChatMessage.cpp */; };
 		ECF98B3F2A77D93F00F7593C /* Session.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ECF98B3D2A77D93F00F7593C /* Session.cpp */; };
 		ECF98B422A77D94800F7593C /* Server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ECF98B402A77D94800F7593C /* Server.cpp */; };
 		ECF98B482A7D873300F7593C /* Room.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ECF98B462A7D873300F7593C /* Room.cpp */; };
@@ -29,6 +31,10 @@
 		EC047FB42A5BB7CE00D4FF42 /* testChatServer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testChatServer; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC047FB72A5BB7CF00D4FF42 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		EC759A032A6FF97B00ED5CFF /* readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
+		ECB02D002AA665F2004E51FE /* chat.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat.pb.cc; sourceTree = "<group>"; };
+		ECB02D012AA665F3004E51FE /* chat.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = chat.pb.h; sourceTree = "<group>"; };
+		ECB02D032AA666A3004E51FE /* ChatMessage.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChatMessage.cpp; sourceTree = "<group>"; };
+		ECB02D042AA666A3004E51FE /* ChatMessage.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChatMessage.hpp; sourceTree = "<group>"; };
 		ECF98B3B2A77D84700F7593C /* .clang-format */ = {isa = PBXFileReference; lastKnownFileType = text; path = ".clang-format"; sourceTree = "<group>"; };
 		ECF98B3D2A77D93F00F7593C /* Session.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Session.cpp; sourceTree = "<group>"; };
 		ECF98B3E2A77D93F00F7593C /* Session.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Session.hpp; sourceTree = "<group>"; };
@@ -70,6 +76,8 @@
 		EC047FB62A5BB7CF00D4FF42 /* testChatServer */ = {
 			isa = PBXGroup;
 			children = (
+				ECB02D002AA665F2004E51FE /* chat.pb.cc */,
+				ECB02D012AA665F3004E51FE /* chat.pb.h */,
 				EC047FB72A5BB7CF00D4FF42 /* main.cpp */,
 				ECF98B3D2A77D93F00F7593C /* Session.cpp */,
 				ECF98B3E2A77D93F00F7593C /* Session.hpp */,
@@ -77,6 +85,8 @@
 				ECF98B412A77D94800F7593C /* Server.hpp */,
 				ECF98B462A7D873300F7593C /* Room.cpp */,
 				ECF98B472A7D873300F7593C /* Room.hpp */,
+				ECB02D032AA666A3004E51FE /* ChatMessage.cpp */,
+				ECB02D042AA666A3004E51FE /* ChatMessage.hpp */,
 			);
 			path = testChatServer;
 			sourceTree = "<group>";
@@ -150,7 +160,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = " if [ -z \"${SRCROOT}\" ]; then\n    echo \"The SRCROOT build setting must be set\"\n    exit 1\nfi\n\nfind \"${SRCROOT}\" \\( -name '*.h' -or -name '*.cpp' \\) -exec /usr/local/bin/clang-format -i {} \\;\n";
+			shellScript = " if [ -z \"${SRCROOT}\" ]; then\n    echo \"The SRCROOT build setting must be set\"\n    exit 1\nfi\n\nfind \"${SRCROOT}\" \\( -name '*.h' -or -name '*.cpp' \\) -exec /usr/local/bin/clang-format -i {} \\;\n\n/Users/inhyuk/Documents/github/boost/vcpkg/installed/x64-osx/tools/protobuf/protoc --proto_path=$SRCROOT --cpp_out=$SRCROOT/testChatServer $SRCROOT/chat.proto\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -159,6 +169,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ECB02D022AA665F3004E51FE /* chat.pb.cc in Sources */,
+				ECB02D052AA666A3004E51FE /* ChatMessage.cpp in Sources */,
 				ECF98B3F2A77D93F00F7593C /* Session.cpp in Sources */,
 				ECF98B422A77D94800F7593C /* Server.cpp in Sources */,
 				ECF98B482A7D873300F7593C /* Room.cpp in Sources */,
@@ -285,7 +297,9 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CODE_SIGN_STYLE = Automatic;
-				HEADER_SEARCH_PATHS = /usr/local/opt/boost/include;
+				HEADER_SEARCH_PATHS = "/Users/inhyuk/Documents/github/boost/vcpkg/installed/x64-osx/include";
+				LIBRARY_SEARCH_PATHS = "/Users/inhyuk/Documents/github/boost/vcpkg/installed/x64-osx/lib";
+				OTHER_LDFLAGS = "-lprotobuf";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -295,7 +309,9 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CODE_SIGN_STYLE = Automatic;
-				HEADER_SEARCH_PATHS = /usr/local/opt/boost/include;
+				HEADER_SEARCH_PATHS = "/Users/inhyuk/Documents/github/boost/vcpkg/installed/x64-osx/include";
+				LIBRARY_SEARCH_PATHS = "/Users/inhyuk/Documents/github/boost/vcpkg/installed/x64-osx/lib";
+				OTHER_LDFLAGS = "-lprotobuf";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
