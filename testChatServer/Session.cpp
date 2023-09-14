@@ -16,26 +16,28 @@ void Session::start() {
         [self = shared_from_this()] { return self->write(); }, detached);
 }
 
-boost::asio::awaitable<void> Session::readNickname() {
-    try {
-        std::string readMsg;
-        std::size_t n = co_await boost::asio::async_read_until(
-            socket_, boost::asio::dynamic_buffer(readMsg, 1024), "\n",
-            use_awaitable);
-        nickname_ = readMsg.substr(0, n - 1);
-    } catch (std::exception&) {
-        stop();
-    }
-}
 boost::asio::awaitable<void> Session::readMsg() {
     try {
-        for (std::string readMsg;;) {
-            std::size_t n = co_await boost::asio::async_read_until(
-                socket_, boost::asio::dynamic_buffer(readMsg, 1024), "\n",
+        for (;;) {
+            uint32_t networkDataSize;
+            co_await boost::asio::async_read(
+                socket_,
+                boost::asio::buffer(&networkDataSize, sizeof(networkDataSize)),
                 use_awaitable);
-            std::string sendLine = nickname() + ": " + readMsg;
-            room_->deliver(sendLine);
-            readMsg.erase(0, n);
+
+            std::size_t dataSize = ntohl(networkDataSize);
+
+            std::string binaryData(dataSize, '\0');
+            co_await boost::asio::async_read(
+                socket_, boost::asio::buffer(binaryData), use_awaitable);
+            ChatMessage chatMessage;
+            chatMessage.decode(binaryData);
+
+            std::cout << "User name :" << chatMessage.getUserName()
+                      << std::endl;
+            std::cout << "TimeStamp : " << chatMessage.getTimestamp()
+                      << std::endl;
+            room_->deliver(chatMessage);
         }
     } catch (std::exception&) {
         stop();
@@ -44,7 +46,7 @@ boost::asio::awaitable<void> Session::readMsg() {
 
 boost::asio::awaitable<void> Session::startRead() {
     try {
-        co_await readNickname();
+        //        co_await readNickname();
         room_->join(shared_from_this());
         co_await readMsg();
     } catch (std::exception&) {
@@ -52,8 +54,12 @@ boost::asio::awaitable<void> Session::startRead() {
     }
 }
 
-void Session::deliver(const std::string& msg) {
-    std::cout << "msg " << msg << std::endl;
+// void Session::deliver(const std::string& msg) {
+//     std::cout << "msg " << msg << std::endl;
+//     writeMsgs_.push_back(msg);
+//     timer_.cancel_one();
+// }
+void Session::deliver(const ChatMessage& msg) {
     writeMsgs_.push_back(msg);
     timer_.cancel_one();
 }
@@ -65,9 +71,16 @@ boost::asio::awaitable<void> Session::write() {
                 boost::system::error_code ec;
                 co_await timer_.async_wait(redirect_error(use_awaitable, ec));
             } else {
+                auto sendBytes = writeMsgs_.front().encode();
+                uint32_t dataSize = static_cast<uint32_t>(sendBytes.size());
+                dataSize = htonl(dataSize);
+
                 co_await boost::asio::async_write(
-                    socket_, boost::asio::buffer(writeMsgs_.front()),
+                    socket_, boost::asio::buffer(&dataSize, sizeof(dataSize)),
                     use_awaitable);
+                co_await boost::asio::async_write(
+                    socket_, boost::asio::buffer(sendBytes), use_awaitable);
+
                 writeMsgs_.pop_front();
             }
         }

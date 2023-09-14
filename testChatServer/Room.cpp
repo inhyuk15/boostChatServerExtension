@@ -1,5 +1,6 @@
 #include "Room.hpp"
 
+#include "ChatMessage.hpp"
 #include "Session.hpp"
 
 Room::Room() {}
@@ -14,7 +15,7 @@ void Room::leave(std::shared_ptr<Session> session) {
     sessions_.erase(session);
 }
 
-void Room::deliver(const std::string& msg) {
+void Room::deliver(const ChatMessage& msg) {
     for (auto session : sessions_) {
         session->deliver(msg);
     }
